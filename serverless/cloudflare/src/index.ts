@@ -21,6 +21,8 @@ interface Env {
   PMTILES_PATH?: string;
   // biome-ignore lint: config name
   PUBLIC_HOSTNAME?: string;
+  // biome-ignore lint: config name
+  PMTILES_WORKER_KV: KVNamespace;
 }
 
 class KeyNotFoundError extends Error {}
@@ -98,7 +100,10 @@ export default {
       return new Response(undefined, { status: 405 });
 
     const url = new URL(request.url);
-    const { ok, name, tile, ext } = tile_path(url.pathname);
+    let { ok, name, tile, ext } = tile_path(url.pathname);
+    if (name === "openmaptiles") {
+      name = await env.PMTILES_WORKER_KV.get('openmaptiles-latest') ?? name;
+    }
 
     const cache = caches.default;
 
