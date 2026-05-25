@@ -101,9 +101,7 @@ export default {
 
     const url = new URL(request.url);
     let { ok, name, tile, ext } = tile_path(url.pathname);
-    if (name === "openmaptiles") {
-      name = await env.PMTILES_WORKER_KV.get('openmaptiles-latest') ?? name;
-    }
+    name = await env.PMTILES_WORKER_KV.get(name + '-latest') ?? name;
 
     const cache = caches.default;
 
