@@ -134,11 +134,12 @@ export default {
     const cacheableResponse = (
       body: ArrayBuffer | string | undefined,
       cacheableHeaders: Headers,
-      status: number
+      status: number,
+      tileset404: boolean = false,
     ) => {
       cacheableHeaders.set(
         "Cache-Control",
-        env.CACHE_CONTROL || "public, max-age=86400"
+        tileset404 ? "public, max-age=180" : (env.CACHE_CONTROL || "public, max-age=86400")
       );
 
       const cacheable = new Response(body, {
@@ -219,7 +220,7 @@ export default {
       return cacheableResponse(undefined, cacheableHeaders, 204);
     } catch (e) {
       if (e instanceof KeyNotFoundError) {
-        return cacheableResponse("Archive not found", cacheableHeaders, 404);
+        return cacheableResponse("Archive not found", cacheableHeaders, 404, true);
       }
       throw e;
     }
